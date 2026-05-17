@@ -1,0 +1,19 @@
+- generic [ref=e294]:
+  - generic [ref=e295]:
+    - heading "你的 狗格原型" [level=1] [ref=e296]:
+      - text: 你的
+      - text: 狗格原型
+    - paragraph [ref=e297]: DOGTI Personality Revealed
+  - generic [ref=e298]:
+    - generic [ref=e299]: 你的狗格是：
+    - generic [ref=e300]:
+      - generic [ref=e301]: 🐕
+      - generic [ref=e302]: Image Placeholder
+    - generic [ref=e303]: ESTJ
+    - generic [ref=e304]: 美国斗牛犬
+    - generic [ref=e305]: American Bulldog
+    - paragraph [ref=e307]: 你是一只美国斗牛犬。意志坚定、执行力爆表。别人在犹豫的时候你已经干完了。你不喜欢废话，相信行动胜于一切。有时候看起来凶，但其实那颗心比谁都可靠。
+  - generic [ref=e308]:
+    - button "分享我的狗格" [ref=e309] [cursor=pointer]
+    - button "重新测试" [ref=e310] [cursor=pointer]
+  - generic [ref=e311]: DOGTI · 2026
