@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DOGTI 狗格测试</title>
+<style>
+  :root {
+    --bg: #fdf8f0;
+    --gold: #c17817;
+    --gold-light: #faf0e0;
+    --text: #3d2b1a;
+    --text-light: #8b7355;
+    --card: #ffffff;
+    --border: #f0e6d8;
+    --shadow: rgba(150, 100, 40, 0.06);
+    --dim-ei: #e8814a;
+    --dim-sn: #5a9e6f;
+    --dim-tf: #6b7db3;
+    --dim-jp: #b0885c;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .container { max-width: 480px; margin: 0 auto; padding: 0 16px 120px; }
+
+  /* Header */
+  .header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(253, 248, 240, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner {
+    max-width: 480px; margin: 0 auto; padding: 0 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 800; font-size: 18px; color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .logo-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, #d4956b, #c17817);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 2px 8px rgba(193, 120, 23, 0.25);
+  }
+  .progress-badge {
+    font-size: 12px; font-weight: 700; color: var(--gold);
+    background: var(--gold-light); padding: 4px 12px; border-radius: 20px;
+  }
+
+  /* Title Section */
+  .hero { text-align: center; padding: 28px 0 8px; }
+  .hero h1 { font-size: 28px; font-weight: 900; color: var(--text); letter-spacing: -1px; line-height: 1.3; }
+  .hero .accent { color: var(--gold); }
+  .hero p { color: var(--text-light); font-size: 13px; margin-top: 6px; }
+
+  /* Dimension Section */
+  .dim-section { margin-top: 20px; }
+  .dim-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  }
+  .dim-badge {
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+    color: #fff; padding: 5px 12px; border-radius: 20px; text-transform: uppercase;
+  }
+  .dim-badge.ei { background: var(--dim-ei); }
+  .dim-badge.sn { background: var(--dim-sn); }
+  .dim-badge.tf { background: var(--dim-tf); }
+  .dim-badge.jp { background: var(--dim-jp); }
+  .dim-label { font-size: 11px; color: var(--text-light); font-weight: 600; letter-spacing: 0.5px; }
+
+  /* Question Card */
+  .q-card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 16px var(--shadow);
+    border: 1.5px solid transparent;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .q-card.answered { border-color: #e8d5c0; }
+  .q-num {
+    font-size: 10px; font-weight: 700; color: var(--text-light);
+    letter-spacing: 1px; margin-bottom: 8px;
+  }
+  .q-text {
+    font-size: 16px; font-weight: 700; color: var(--text);
+    line-height: 1.6; margin-bottom: 14px;
+  }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt-label {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fefcf9;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .opt-label:active { transform: scale(0.985); }
+  .opt-label:hover { border-color: #d4b896; background: #fff; }
+  .opt-radio {
+    width: 20px; height: 20px; min-width: 20px;
+    border-radius: 50%; border: 2px solid #d4c4b0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .opt-radio::after {
+    content: ''; width: 8px; height: 8px; border-radius: 50%;
+    background: transparent; transition: all 0.2s;
+  }
+  input[type="radio"] { display: none; }
+  input[type="radio"]:checked + .opt-label {
+    border-color: var(--gold); background: var(--gold-light);
+  }
+  input[type="radio"]:checked + .opt-label .opt-radio {
+    border-color: var(--gold); background: var(--gold);
+  }
+  input[type="radio"]:checked + .opt-label .opt-radio::after {
+    background: #fff;
+  }
+  .opt-text { font-size: 14px; color: var(--text); line-height: 1.5; font-weight: 500; }
+
+  /* Submit Bar */
+  .submit-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(253, 248, 240, 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 14px 16px max(14px, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+    z-index: 50;
+  }
+  .submit-inner { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .submit-hint { font-size: 11px; color: #c0a88a; font-weight: 600; }
+  .submit-btn {
+    width: 100%; padding: 16px;
+    border: none; border-radius: 20px;
+    font-size: 16px; font-weight: 800;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.5px;
+    background: #d4c4b0; color: #fff;
+  }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn.ready {
+    background: linear-gradient(135deg, #d4956b, #c17817);
+    color: #fff;
+    box-shadow: 0 6px 24px rgba(193, 120, 23, 0.3);
+  }
+  .submit-btn.ready:hover { box-shadow: 0 8px 28px rgba(193, 120, 23, 0.4); transform: translateY(-1px); }
+
+  /* Result Page */
+  .result-page { display: none; }
+  .result-page.active { display: block; }
+  .quiz-page.hidden { display: none; }
+  .header.hidden { display: none; }
+
+  .result-card {
+    background: var(--card);
+    border-radius: 28px;
+    padding: 36px 24px;
+    text-align: center;
+    box-shadow: 0 8px 30px var(--shadow);
+    border-top: 6px solid var(--gold);
+  }
+  .result-label {
+    font-size: 11px; font-weight: 800; color: var(--text-light);
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;
+  }
+  .result-img-wrap {
+    width: 100%; max-width: 260px; aspect-ratio: 1;
+    margin: 0 auto 24px;
+    border-radius: 24px;
+    background: var(--gold-light);
+    border: 3px solid #f0e6d8;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .result-img-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .result-img-placeholder {
+    font-size: 56px;
+    color: #d4b896;
+  }
+  .result-img-wrap .img-label {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(61, 43, 26, 0.55);
+    color: #fff; font-size: 10px; padding: 6px;
+    text-align: center; letter-spacing: 0.5px;
+  }
+  .result-type {
+    display: inline-block;
+    font-size: 12px; font-weight: 800; letter-spacing: 2px;
+    color: #fff; background: var(--gold);
+    padding: 6px 16px; border-radius: 20px; margin-bottom: 12px;
+  }
+  .result-breed {
+    font-size: 32px; font-weight: 900; color: var(--text);
+    letter-spacing: -1px; margin-bottom: 4px;
+  }
+  .result-breed-en {
+    font-size: 13px; color: var(--text-light);
+    font-weight: 500; margin-bottom: 16px;
+  }
+  .result-desc {
+    background: #fefcf8; border-radius: 18px; padding: 18px;
+    border: 1px solid var(--border);
+  }
+  .result-desc p {
+    font-size: 14px; color: var(--text); line-height: 1.8;
+    font-weight: 500;
+  }
+  .result-actions { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+  .btn-restart {
+    width: 100%; padding: 16px;
+    background: #fff; border: 1.5px solid var(--border);
+    border-radius: 20px; font-size: 15px; font-weight: 700;
+    color: var(--text-light); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-restart:active { background: #faf6f0; transform: scale(0.98); }
+  .btn-share {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #d4956b, #c17817);
+    border: none; border-radius: 20px;
+    font-size: 16px; font-weight: 800; color: #fff;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(193, 120, 23, 0.25);
+    transition: all 0.2s;
+  }
+  .btn-share:active { transform: scale(0.98); }
+
+  .footer {
+    text-align: center; padding: 32px 0 16px;
+    color: #d4c4b0; font-size: 10px; font-weight: 600;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header" id="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🐾</div>
+      DOGTI
+    </div>
+    <div class="progress-badge" id="progressBadge">0 / 20</div>
+  </div>
+</div>
+
+<div class="container quiz-page" id="quizPage">
+  <div class="hero">
+    <h1>发现你的<br><span class="accent">狗格原型</span></h1>
+    <p>20 道题目 · 找到属于你的那隻狗</p>
+  </div>
+
+  <!-- E/I Dimension -->
+  <div class="dim-section">
+    <div class="dim-header">
+      <span class="dim-badge ei">E / I</span>
+      <span class="dim-label">外向 · 内向</span>
+    </div>
+
+    <div class="q-card" data-dim="EI" data-q="0">
+      <div class="q-num">QUESTION 1</div>
+      <div class="q-text">假如主人出门了 2 天没有回家，ta 回家之后家里的完整度会是百分之多少？</div>
+      <div class="options">
+        <input type="radio" name="q-EI-0" id="q-EI-0-a" data-dim="EI" data-score="1">
+        <label class="opt-label" for="q-EI-0-a"><span class="opt-radio"></span><span class="opt-text">100% 我是主人的乖宝宝！</span></label>
+        <input type="radio" name="q-EI-0" id="q-EI-0-b" data-dim="EI" data-score="0">
+        <label class="opt-label" for="q-EI-0-b"><span class="opt-radio"></span><span class="opt-text">90% 这个马克杯应该不要了吧？</span></label>
+        <input type="radio" name="q-EI-0" id="q-EI-0-c" data-dim="EI" data-score="-1">
+        <label class="opt-label" for="q-EI-0-c"><span class="opt-radio"></span><span class="opt-text">70% 摄像头移开，研究一下到底什么方式掉落才能使粉饼碎成刚刚好 5 块</span></label>
+        <input type="radio" name="q-EI-0" id="q-EI-0-d" data-dim="EI" data-score="-1">
+        <label class="opt-label" for="q-EI-0-d"><span class="opt-radio"></span><span class="opt-text">50% 及以下，鱼缸和浴缸难道不是同一个东西吗？</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="EI" data-q="1">
+      <div class="q-num">QUESTION 2</div>
+      <div class="q-text">家里来了一个没见过的人，你会？</div>
+      <div class="options">
+        <input type="radio" name="q-EI-1" id="q-EI-1-a" data-dim="EI" data-score="1">
+        <label class="opt-label" for="q-EI-1-a"><span class="opt-radio"></span><span class="opt-text">我直接舔了！舌头无风自动</span></label>
+        <input type="radio" name="q-EI-1" id="q-EI-1-b" data-dim="EI" data-score="0">
+        <label class="opt-label" for="q-EI-1-b"><span class="opt-radio"></span><span class="opt-text">先观察观察主人和 ta 的关系再说</span></label>
+        <input type="radio" name="q-EI-1" id="q-EI-1-c" data-dim="EI" data-score="-1">
+        <label class="opt-label" for="q-EI-1-c"><span class="opt-radio"></span><span class="opt-text">是坏人的臭味，主人一定被骗了</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="EI" data-q="2">
+      <div class="q-num">QUESTION 3</div>
+      <div class="q-text">你有几种和主人交流的方式？</div>
+      <div class="options">
+        <input type="radio" name="q-EI-2" id="q-EI-2-a" data-dim="EI" data-score="1">
+        <label class="opt-label" for="q-EI-2-a"><span class="opt-radio"></span><span class="opt-text">就一种，汪（wāng）</span></label>
+        <input type="radio" name="q-EI-2" id="q-EI-2-b" data-dim="EI" data-score="0">
+        <label class="opt-label" for="q-EI-2-b"><span class="opt-radio"></span><span class="opt-text">基本的情绪当然都要有</span></label>
+        <input type="radio" name="q-EI-2" id="q-EI-2-c" data-dim="EI" data-score="-1">
+        <label class="opt-label" for="q-EI-2-c"><span class="opt-radio"></span><span class="opt-text">"你前天下午 5 点半和隔壁家颜色浅一点的那只金毛是不是走得有点近了你给我反省一下"</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="EI" data-q="3">
+      <div class="q-num">QUESTION 4</div>
+      <div class="q-text">今天去了很喜欢的狗公园，回家了你会？</div>
+      <div class="options">
+        <input type="radio" name="q-EI-3" id="q-EI-3-a" data-dim="EI" data-score="1">
+        <label class="opt-label" for="q-EI-3-a"><span class="opt-radio"></span><span class="opt-text">继续跑，家里就不是狗公园吗？</span></label>
+        <input type="radio" name="q-EI-3" id="q-EI-3-b" data-dim="EI" data-score="0">
+        <label class="opt-label" for="q-EI-3-b"><span class="opt-radio"></span><span class="opt-text">表达一下被贬之后依依不舍，伤春悲秋，寂寥孤独的心绪，然后休息</span></label>
+        <input type="radio" name="q-EI-3" id="q-EI-3-c" data-dim="EI" data-score="-1">
+        <label class="opt-label" for="q-EI-3-c"><span class="opt-radio"></span><span class="opt-text">直接睡觉</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="EI" data-q="4">
+      <div class="q-num">QUESTION 5</div>
+      <div class="q-text">主人带你搬了新家，你刚进门会？</div>
+      <div class="options">
+        <input type="radio" name="q-EI-4" id="q-EI-4-a" data-dim="EI" data-score="1">
+        <label class="opt-label" for="q-EI-4-a"><span class="opt-radio"></span><span class="opt-text">冲遍所有房间，看看怎么个事</span></label>
+        <input type="radio" name="q-EI-4" id="q-EI-4-b" data-dim="EI" data-score="0">
+        <label class="opt-label" for="q-EI-4-b"><span class="opt-radio"></span><span class="opt-text">闻来闻去，寻找熟悉的味道</span></label>
+        <input type="radio" name="q-EI-4" id="q-EI-4-c" data-dim="EI" data-score="-1">
+        <label class="opt-label" for="q-EI-4-c"><span class="opt-radio"></span><span class="opt-text">原地自闭。"突然好想你，你会在哪里，过得快…"</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- S/N Dimension -->
+  <div class="dim-section">
+    <div class="dim-header">
+      <span class="dim-badge sn">S / N</span>
+      <span class="dim-label">实感 · 直觉</span>
+    </div>
+
+    <div class="q-card" data-dim="SN" data-q="0">
+      <div class="q-num">QUESTION 6</div>
+      <div class="q-text">假如你只能拥有一个狗玩具，那会是？</div>
+      <div class="options">
+        <input type="radio" name="q-SN-0" id="q-SN-0-a" data-dim="SN" data-score="1">
+        <label class="opt-label" for="q-SN-0-a"><span class="opt-radio"></span><span class="opt-text">球，它跑，我追，它插翅…</span></label>
+        <input type="radio" name="q-SN-0" id="q-SN-0-b" data-dim="SN" data-score="0">
+        <label class="opt-label" for="q-SN-0-b"><span class="opt-radio"></span><span class="opt-text">嗅闻垫</span></label>
+        <input type="radio" name="q-SN-0" id="q-SN-0-c" data-dim="SN" data-score="-1">
+        <label class="opt-label" for="q-SN-0-c"><span class="opt-radio"></span><span class="opt-text">狗狗交流按钮，学无止境，今天想知道 2+3 是多少</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="SN" data-q="1">
+      <div class="q-num">QUESTION 7</div>
+      <div class="q-text">家里有扇门，你从来不知道那扇门后面是什么东西，但是有一天那扇门终于打开的时候，主人却在离门很远的地方摆了一杯从未见过的星巴克狗奶油！同样是或许一生一次的机会，你会？</div>
+      <div class="options">
+        <input type="radio" name="q-SN-1" id="q-SN-1-a" data-dim="SN" data-score="1">
+        <label class="opt-label" for="q-SN-1-a"><span class="opt-radio"></span><span class="opt-text">什么门？吸溜吸溜</span></label>
+        <input type="radio" name="q-SN-1" id="q-SN-1-b" data-dim="SN" data-score="0">
+        <label class="opt-label" for="q-SN-1-b"><span class="opt-radio"></span><span class="opt-text">爪心爪背都是肉，无奈开始折返跑</span></label>
+        <input type="radio" name="q-SN-1" id="q-SN-1-c" data-dim="SN" data-score="-1">
+        <label class="opt-label" for="q-SN-1-c"><span class="opt-radio"></span><span class="opt-text">选门，万一门后其实全是狗奶油怎么办？我是说万一</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="SN" data-q="2">
+      <div class="q-num">QUESTION 8</div>
+      <div class="q-text">主人指了指门，又指了指狗粮，ta 可能是什么意思？</div>
+      <div class="options">
+        <input type="radio" name="q-SN-2" id="q-SN-2-a" data-dim="SN" data-score="1">
+        <label class="opt-label" for="q-SN-2-a"><span class="opt-radio"></span><span class="opt-text">ta 可能在跳舞</span></label>
+        <input type="radio" name="q-SN-2" id="q-SN-2-b" data-dim="SN" data-score="0">
+        <label class="opt-label" for="q-SN-2-b"><span class="opt-radio"></span><span class="opt-text">吃完就可以出门去见对门家小美了！</span></label>
+        <input type="radio" name="q-SN-2" id="q-SN-2-c" data-dim="SN" data-score="-1">
+        <label class="opt-label" for="q-SN-2-c"><span class="opt-radio"></span><span class="opt-text">默默思考门 + 狗粮的所有可能性，然后想到宕机</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="SN" data-q="3">
+      <div class="q-num">QUESTION 9</div>
+      <div class="q-text">你最爱的那颗球滚进了一个茶几底下，进不去也拿不到，你会？</div>
+      <div class="options">
+        <input type="radio" name="q-SN-3" id="q-SN-3-a" data-dim="SN" data-score="1">
+        <label class="opt-label" for="q-SN-3-a"><span class="opt-radio"></span><span class="opt-text">扒拉几次扒不出来，回头找主人帮助</span></label>
+        <input type="radio" name="q-SN-3" id="q-SN-3-b" data-dim="SN" data-score="0">
+        <label class="opt-label" for="q-SN-3-b"><span class="opt-radio"></span><span class="opt-text">使劲大叫，因为每次大叫总会让世界改变一点点，或许这次也是一样</span></label>
+        <input type="radio" name="q-SN-3" id="q-SN-3-c" data-dim="SN" data-score="-1">
+        <label class="opt-label" for="q-SN-3-c"><span class="opt-radio"></span><span class="opt-text">球存在吗？也许我一生下来就从来不知道有球这个东西的存在，我已经忘了刚才为什么要伸手，因为伸惯了</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="SN" data-q="4">
+      <div class="q-num">QUESTION 10</div>
+      <div class="q-text">你爱睡的垫子上一直有一根奇怪的鸡毛，它在那里没有被叼走的原因是：</div>
+      <div class="options">
+        <input type="radio" name="q-SN-4" id="q-SN-4-a" data-dim="SN" data-score="1">
+        <label class="opt-label" for="q-SN-4-a"><span class="opt-radio"></span><span class="opt-text">我喜欢它的味道，有时候可以闻毛充饥</span></label>
+        <input type="radio" name="q-SN-4" id="q-SN-4-b" data-dim="SN" data-score="0">
+        <label class="opt-label" for="q-SN-4-b"><span class="opt-radio"></span><span class="opt-text">懒狗就是我</span></label>
+        <input type="radio" name="q-SN-4" id="q-SN-4-c" data-dim="SN" data-score="-1">
+        <label class="opt-label" for="q-SN-4-c"><span class="opt-radio"></span><span class="opt-text">不是你说我都没有注意到</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- T/F Dimension -->
+  <div class="dim-section">
+    <div class="dim-header">
+      <span class="dim-badge tf">T / F</span>
+      <span class="dim-label">思考 · 情感</span>
+    </div>
+
+    <div class="q-card" data-dim="TF" data-q="0">
+      <div class="q-num">QUESTION 11</div>
+      <div class="q-text">主人今天好像一天都躺着没太动，可是已经到了天一度的飞盘时间，你会？</div>
+      <div class="options">
+        <input type="radio" name="q-TF-0" id="q-TF-0-a" data-dim="TF" data-score="1">
+        <label class="opt-label" for="q-TF-0-a"><span class="opt-radio"></span><span class="opt-text">把主人的手机叼出去丢了，感觉 ta 总看完它就叹气</span></label>
+        <input type="radio" name="q-TF-0" id="q-TF-0-b" data-dim="TF" data-score="0">
+        <label class="opt-label" for="q-TF-0-b"><span class="opt-radio"></span><span class="opt-text">静观其变</span></label>
+        <input type="radio" name="q-TF-0" id="q-TF-0-c" data-dim="TF" data-score="-1">
+        <label class="opt-label" for="q-TF-0-c"><span class="opt-radio"></span><span class="opt-text">过去蹭蹭 ta，把一只爪子搭在 ta 身上</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="TF" data-q="1">
+      <div class="q-num">QUESTION 12</div>
+      <div class="q-text">你不小心把沙发咬破了，你会？</div>
+      <div class="options">
+        <input type="radio" name="q-TF-1" id="q-TF-1-a" data-dim="TF" data-score="1">
+        <label class="opt-label" for="q-TF-1-a"><span class="opt-radio"></span><span class="opt-text">叼一把剪刀到旁边，假装是人的犯罪现场</span></label>
+        <input type="radio" name="q-TF-1" id="q-TF-1-b" data-dim="TF" data-score="0">
+        <label class="opt-label" for="q-TF-1-b"><span class="opt-radio"></span><span class="opt-text">将错就错，多咬几口</span></label>
+        <input type="radio" name="q-TF-1" id="q-TF-1-c" data-dim="TF" data-score="-1">
+        <label class="opt-label" for="q-TF-1-c"><span class="opt-radio"></span><span class="opt-text">等主人进门直接翻肚皮，先把 ta 哄开心再说</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="TF" data-q="2">
+      <div class="q-num">QUESTION 13</div>
+      <div class="q-text">主人是一名狂热的暗黑死亡重金属爱好者，而你不胜其扰，今天你看他又拿起了 CD 走向了碟机，你选择？</div>
+      <div class="options">
+        <input type="radio" name="q-TF-2" id="q-TF-2-a" data-dim="TF" data-score="1">
+        <label class="opt-label" for="q-TF-2-a"><span class="opt-radio"></span><span class="opt-text">恶狠狠地看着 ta，并给他一些真正的暗黑死亡重金属狗叫听听</span></label>
+        <input type="radio" name="q-TF-2" id="q-TF-2-b" data-dim="TF" data-score="0">
+        <label class="opt-label" for="q-TF-2-b"><span class="opt-radio"></span><span class="opt-text">懒得管了，Play that funky music white boy</span></label>
+        <input type="radio" name="q-TF-2" id="q-TF-2-c" data-dim="TF" data-score="-1">
+        <label class="opt-label" for="q-TF-2-c"><span class="opt-radio"></span><span class="opt-text">直接去拔掉插头</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="TF" data-q="3">
+      <div class="q-num">QUESTION 14</div>
+      <div class="q-text">主人同时在撸你和另一只狗，你会？</div>
+      <div class="options">
+        <input type="radio" name="q-TF-3" id="q-TF-3-a" data-dim="TF" data-score="1">
+        <label class="opt-label" for="q-TF-3-a"><span class="opt-radio"></span><span class="opt-text">客观来说主人有两只手，资源分配合理，没毛病</span></label>
+        <input type="radio" name="q-TF-3" id="q-TF-3-b" data-dim="TF" data-score="0">
+        <label class="opt-label" for="q-TF-3-b"><span class="opt-radio"></span><span class="opt-text">在心里默默计时，如果那边多了 3 秒我会用鼻子拱一下提醒</span></label>
+        <input type="radio" name="q-TF-3" id="q-TF-3-c" data-dim="TF" data-score="-1">
+        <label class="opt-label" for="q-TF-3-c"><span class="opt-radio"></span><span class="opt-text">偷偷把身体往主人手掌里蹭</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="TF" data-q="4">
+      <div class="q-num">QUESTION 15</div>
+      <div class="q-text">假如这个世界上突然没有主人了，你想去哪里就去哪里，你会干什么？</div>
+      <div class="options">
+        <input type="radio" name="q-TF-4" id="q-TF-4-a" data-dim="TF" data-score="1">
+        <label class="opt-label" for="q-TF-4-a"><span class="opt-radio"></span><span class="opt-text">什么是主人？开始游历世界</span></label>
+        <input type="radio" name="q-TF-4" id="q-TF-4-b" data-dim="TF" data-score="0">
+        <label class="opt-label" for="q-TF-4-b"><span class="opt-radio"></span><span class="opt-text">在家宅着</span></label>
+        <input type="radio" name="q-TF-4" id="q-TF-4-c" data-dim="TF" data-score="-1">
+        <label class="opt-label" for="q-TF-4-c"><span class="opt-radio"></span><span class="opt-text">默默趴在主人的毯子边上等待主人，或许 ta 会回到这里</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- J/P Dimension -->
+  <div class="dim-section">
+    <div class="dim-header">
+      <span class="dim-badge jp">J / P</span>
+      <span class="dim-label">判断 · 感知</span>
+    </div>
+
+    <div class="q-card" data-dim="JP" data-q="0">
+      <div class="q-num">QUESTION 16</div>
+      <div class="q-text">有一天你的碗被主人换了位置，甚至换了一个碗（一个很土的观音腿下的莲花碗），你会？</div>
+      <div class="options">
+        <input type="radio" name="q-JP-0" id="q-JP-0-a" data-dim="JP" data-score="1">
+        <label class="opt-label" for="q-JP-0-a"><span class="opt-radio"></span><span class="opt-text">继续吃，碗里有吃的就是好碗</span></label>
+        <input type="radio" name="q-JP-0" id="q-JP-0-b" data-dim="JP" data-score="0">
+        <label class="opt-label" for="q-JP-0-b"><span class="opt-radio"></span><span class="opt-text">把碗拖回正确的位置，继续吃</span></label>
+        <input type="radio" name="q-JP-0" id="q-JP-0-c" data-dim="JP" data-score="-1">
+        <label class="opt-label" for="q-JP-0-c"><span class="opt-radio"></span><span class="opt-text">绝食抗议</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="JP" data-q="1">
+      <div class="q-num">QUESTION 17</div>
+      <div class="q-text">主人突然在一个奇怪的时间把你抱上了车，你觉得这趟车是通往？</div>
+      <div class="options">
+        <input type="radio" name="q-JP-1" id="q-JP-1-a" data-dim="JP" data-score="1">
+        <label class="opt-label" for="q-JP-1-a"><span class="opt-radio"></span><span class="opt-text">反正肯定是好玩的地方，上车 = 玩</span></label>
+        <input type="radio" name="q-JP-1" id="q-JP-1-b" data-dim="JP" data-score="0">
+        <label class="opt-label" for="q-JP-1-b"><span class="opt-radio"></span><span class="opt-text">不知道，不去想</span></label>
+        <input type="radio" name="q-JP-1" id="q-JP-1-c" data-dim="JP" data-score="-1">
+        <label class="opt-label" for="q-JP-1-c"><span class="opt-radio"></span><span class="opt-text">狗地狱，恐怖的未知，狗类的尽头，一个时间空间都不存在的地方</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="JP" data-q="2">
+      <div class="q-num">QUESTION 18</div>
+      <div class="q-text">主人的朋友们带狗来家里玩。聚会结束了，所有人和狗都走了。客厅里有三只陌生狗的口水印、一地的玩具和半碗别人剩下的水。桌子上有很多乱七八糟不知道是什么的东西，书掉到了地上，派对的杯子里还有残留的液体，你睡觉的垫子被放到了空调上。</div>
+      <div class="options">
+        <input type="radio" name="q-JP-2" id="q-JP-2-a" data-dim="JP" data-score="1">
+        <label class="opt-label" for="q-JP-2-a"><span class="opt-radio"></span><span class="opt-text">I dot caer</span></label>
+        <input type="radio" name="q-JP-2" id="q-JP-2-b" data-dim="JP" data-score="0">
+        <label class="opt-label" for="q-JP-2-b"><span class="opt-radio"></span><span class="opt-text">直接把拖把拿过来放在剩下的水的旁边，然后打翻碗</span></label>
+        <input type="radio" name="q-JP-2" id="q-JP-2-c" data-dim="JP" data-score="-1">
+        <label class="opt-label" for="q-JP-2-c"><span class="opt-radio"></span><span class="opt-text">Chaos is a ladder 派对还没有结束！</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="JP" data-q="3">
+      <div class="q-num">QUESTION 19</div>
+      <div class="q-text">和你住一家的狗兄弟/姐妹说新来的狗粮有股豆汁味，你会？</div>
+      <div class="options">
+        <input type="radio" name="q-JP-3" id="q-JP-3-a" data-dim="JP" data-score="1">
+        <label class="opt-label" for="q-JP-3-a"><span class="opt-radio"></span><span class="opt-text">从今天起开始斋戒</span></label>
+        <input type="radio" name="q-JP-3" id="q-JP-3-b" data-dim="JP" data-score="0">
+        <label class="opt-label" for="q-JP-3-b"><span class="opt-radio"></span><span class="opt-text">闻闻并尝试分辨这狗粮是不是坏了</span></label>
+        <input type="radio" name="q-JP-3" id="q-JP-3-c" data-dim="JP" data-score="-1">
+        <label class="opt-label" for="q-JP-3-c"><span class="opt-radio"></span><span class="opt-text">有吃的还管那么多吗？</span></label>
+      </div>
+    </div>
+
+    <div class="q-card" data-dim="JP" data-q="4">
+      <div class="q-num">QUESTION 20</div>
+      <div class="q-text">假如你只能选择一只狗做朋友，你会选择？</div>
+      <div class="options">
+        <input type="radio" name="q-JP-4" id="q-JP-4-a" data-dim="JP" data-score="1">
+        <label class="opt-label" for="q-JP-4-a"><span class="opt-radio"></span><span class="opt-text">德国牧羊犬</span></label>
+        <input type="radio" name="q-JP-4" id="q-JP-4-b" data-dim="JP" data-score="0">
+        <label class="opt-label" for="q-JP-4-b"><span class="opt-radio"></span><span class="opt-text">西高地</span></label>
+        <input type="radio" name="q-JP-4" id="q-JP-4-c" data-dim="JP" data-score="-1">
+        <label class="opt-label" for="q-JP-4-c"><span class="opt-radio"></span><span class="opt-text">比格犬</span></label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Result Page -->
+<div class="container result-page" id="resultPage">
+  <div class="hero">
+    <h1>你的<br><span class="accent">狗格原型</span></h1>
+    <p>DOGTI Personality Revealed</p>
+  </div>
+
+  <div class="result-card">
+    <div class="result-label">你的狗格是：</div>
+
+    <div class="result-img-wrap" id="resultImgWrap">
+      <!-- 图片占位：晚点替换为实际图片路径 -->
+      <span class="result-img-placeholder">🐕</span>
+      <span class="img-label">Image Placeholder</span>
+    </div>
+
+    <div class="result-type" id="resultType">----</div>
+    <div class="result-breed" id="resultBreed">---</div>
+    <div class="result-breed-en" id="resultBreedEn">---</div>
+
+    <div class="result-desc">
+      <p id="resultDesc">---</p>
+    </div>
+  </div>
+
+  <div class="result-actions">
+    <button class="btn-share" onclick="shareResult()">分享我的狗格</button>
+    <button class="btn-restart" onclick="restart()">重新测试</button>
+  </div>
+
+  <div class="footer">
+    DOGTI · 2026
+  </div>
+</div>
+
+<!-- Submit Bar -->
+<div class="submit-bar" id="submitBar">
+  <div class="submit-inner">
+    <span class="submit-hint" id="submitHint">全选完才会放行。世界已经够乱了，起码把题做完整。</span>
+    <button class="submit-btn" id="submitBtn" disabled>提交并查看结果</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const TOTAL = 20;
+  const DIMS = ['EI', 'SN', 'TF', 'JP'];
+  const DIM_LABELS = { EI: ['E', 'I'], SN: ['S', 'N'], TF: ['T', 'F'], JP: ['J', 'P'] };
+
+  // 16 型 → 犬种映射
+  const DOG_MAP = {
+    'INTJ': { breed: '边牧', breedEn: 'Border Collie', desc: '你是一只边境牧羊犬。聪明绝顶，凡事都有计划 B。你看世界的角度和别人不太一样——别人看到的是公园，你看到的是待优化的放牧路线。你不需要聚光灯，但团队没你不行。' },
+    'INTP': { breed: '柴犬', breedEn: 'Shiba Inu', desc: '你是一只柴犬。独立、骄傲、有自己的节奏。你的内心世界丰富到可以写一套百科全书，但对外表达通常压缩成一个微妙的眼神。别人觉得你高冷，其实你只是在思考宇宙的起源。' },
+    'ENTJ': { breed: '德牧', breedEn: 'German Shepherd', desc: '你是一只德国牧羊犬。天生的领导者，执行力拉满。给你一个任务，你会自动拆成三步并提前完成。在狗群里，你总是那个被推举出来做决定的——当然，你也当仁不让。' },
+    'ENTP': { breed: '哈士奇', breedEn: 'Siberian Husky', desc: '你是一只哈士奇。精力无穷、脑洞清奇。规矩对你来说只是参考，拆家是你不竭的创作欲在燃烧。和你在一起永远不会无聊，但永远要做好下一秒天翻地覆的准备。' },
+    'INFJ': { breed: '阿富汗猎犬', breedEn: 'Afghan Hound', desc: '你是一只阿富汗猎犬。优雅、神秘、自带贵族气场。你不喜欢喧哗，但总能一眼看穿事情的真相。你的内心柔软而深邃，在风中奔跑时，像一首谁也没听过的诗。' },
+    'INFP': { breed: '灵缇', breedEn: 'Greyhound', desc: '你是一只灵缇。温柔、敏感、拥有别人看不见的内心剧场。你可以在沙发上蜷缩一整天，沉浸在自己的幻想世界里。你跑起来像一道闪电，但大多数时候你选择不跑——因为梦还没做完。' },
+    'ENFJ': { breed: '金毛', breedEn: 'Golden Retriever', desc: '你是一只金毛。温暖到发光，是狗群里的太阳。你天生就知道谁不开心，并且不把对方哄好你绝不罢休。你相信每一个陌生人都可能是未来的朋友，这种信仰让你成为世界上最受欢迎的狗。' },
+    'ENFP': { breed: '西高地', breedEn: 'West Highland White Terrier', desc: '你是一只西高地白梗。小小的身体里装着一颗永动机般的好奇心。每一个新朋友、每一种新味道、每一个新玩具都是上帝的礼物。你的快乐会传染，在你身边的人都忍不住笑起来。' },
+    'ISTJ': { breed: '秋田犬', breedEn: 'Akita Inu', desc: '你是一只秋田犬。忠诚、稳重、说到做到。你对待承诺认真到让人感动，不喜欢花里胡哨，但每一个决定都经得起推敲。你就是那种"有你在就让人安心"的存在。' },
+    'ISFJ': { breed: '纽芬兰', breedEn: 'Newfoundland', desc: '你是一只纽芬兰犬。温柔巨人是你的名字。你默默地守护着你在乎的人，不需要感谢也不需要掌声。你或许看起来很大只，但灵魂细腻到能察觉每一丝风的变化。' },
+    'ESTJ': { breed: '美国斗牛犬', breedEn: 'American Bulldog', desc: '你是一只美国斗牛犬。意志坚定、执行力爆表。别人在犹豫的时候你已经干完了。你不喜欢废话，相信行动胜于一切。有时候看起来凶，但其实那颗心比谁都可靠。' },
+    'ESFJ': { breed: '伯恩山', breedEn: 'Bernese Mountain Dog', desc: '你是一只伯恩山犬。端庄、负责、重视每一个家人的幸福。你是和平主义者，狗群里有人吵架你会主动劝架。你的存在就是大家的安全感，像山一样稳稳地在那里。' },
+    'ISTP': { breed: '比利时马犬', breedEn: 'Belgian Malinois', desc: '你是一只比利时马利诺犬。冷静、敏捷、动手能力满分。你不说太多话，但如果有什么东西坏了，你早已默默叼着工具在修。你享受独自攻克难题的快感，是狗界的特种兵。' },
+    'ISFP': { breed: '巴哥', breedEn: 'Pug', desc: '你是一只巴哥犬。随性、可爱、对世界没什么太大敌意。你最大的才华是享受当下——晒太阳、吃好吃的、打个盹，人生已经圆满。你的哲学是：如果不舒服，换个姿势再趴。' },
+    'ESTP': { breed: '腊肠犬', breedEn: 'Dachshund', desc: '你是一只腊肠犬。胆子大、行动快、身材小但气势不输任何大狗。你喜欢冒险，而且从不觉得自己的腿短是什么限制。活在当下、说干就干，你就是狗界的动作片男主角。' },
+    'ESFP': { breed: '博美', breedEn: 'Pomeranian', desc: '你是一只博美犬。天生就是舞台中央的那一个。你有能让一个房间亮起来的能力，走到哪里都自带音效和特效。你喜欢被关注，并认为这不是虚荣——是才华理应得到掌声。' }
+  };
+
+  // 图片路径配置（后续替换实际路径）
+  // key 为 MBTI 类型，value 为图片路径
+  var IMG_MAP = {
+    'INTJ': '', 'INTP': '', 'ENTJ': '', 'ENTP': '',
+    'INFJ': '', 'INFP': '', 'ENFJ': '', 'ENFP': '',
+    'ISTJ': '', 'ISFJ': '', 'ESTJ': '', 'ESFJ': '',
+    'ISTP': '', 'ISFP': '', 'ESTP': '', 'ESFP': ''
+  };
+
+  var progressBadge = document.getElementById('progressBadge');
+  var submitBtn = document.getElementById('submitBtn');
+  var submitHint = document.getElementById('submitHint');
+  var submitBar = document.getElementById('submitBar');
+  var quizPage = document.getElementById('quizPage');
+  var resultPage = document.getElementById('resultPage');
+  var header = document.getElementById('header');
+
+  function countAnswered() {
+    var radios = document.querySelectorAll('.q-card input[type="radio"]:checked');
+    return radios.length;
+  }
+
+  function updateProgress() {
+    var n = countAnswered();
+    progressBadge.textContent = n + ' / ' + TOTAL;
+
+    if (n === TOTAL) {
+      submitBtn.disabled = false;
+      submitBtn.classList.add('ready');
+      submitBtn.textContent = '提交并查看结果';
+      submitHint.textContent = '全部答完，可以提交了！';
+    } else {
+      submitBtn.disabled = true;
+      submitBtn.classList.remove('ready');
+      submitBtn.textContent = '提交并查看结果';
+      submitHint.textContent = '全选完才会放行。世界已经够乱了，起码把题做完整。';
+    }
+  }
+
+  // 监听所有 radio 变化
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.type === 'radio') {
+      var card = e.target.closest('.q-card');
+      if (card) card.classList.add('answered');
+      updateProgress();
+    }
+  });
+
+  // 计算四个维度分数
+  function calcScores() {
+    var scores = { EI: 0, SN: 0, TF: 0, JP: 0 };
+    var radios = document.querySelectorAll('.q-card input[type="radio"]:checked');
+    radios.forEach(function(r) {
+      var dim = r.getAttribute('data-dim');
+      var sc = parseInt(r.getAttribute('data-score'), 10);
+      if (dim && scores.hasOwnProperty(dim)) {
+        scores[dim] += sc;
+      }
+    });
+    return scores;
+  }
+
+  // 判定 MBTI 类型
+  function getMBTIType(scores) {
+    var letters = [];
+    DIMS.forEach(function(dim) {
+      var labels = DIM_LABELS[dim];
+      letters.push(scores[dim] > 0 ? labels[0] : labels[1]);
+    });
+    return letters.join('');
+  }
+
+  // 提交
+  submitBtn.addEventListener('click', function() {
+    if (countAnswered() < TOTAL) return;
+
+    var scores = calcScores();
+    var mbti = getMBTIType(scores);
+    var dog = DOG_MAP[mbti];
+
+    if (!dog) {
+      alert('出错了，请联系开发者。MBTI: ' + mbti);
+      return;
+    }
+
+    // 隐藏题目页
+    quizPage.classList.add('hidden');
+    header.classList.add('hidden');
+    submitBar.style.display = 'none';
+
+    // 渲染结果
+    document.getElementById('resultType').textContent = mbti;
+    document.getElementById('resultBreed').textContent = dog.breed;
+    document.getElementById('resultBreedEn').textContent = dog.breedEn;
+    document.getElementById('resultDesc').textContent = dog.desc;
+
+    // 图片
+    var imgWrap = document.getElementById('resultImgWrap');
+    var imgPath = IMG_MAP[mbti];
+    if (imgPath) {
+      imgWrap.innerHTML = '<img src="' + imgPath + '" alt="' + dog.breed + '" />';
+    } else {
+      imgWrap.innerHTML = '<span class="result-img-placeholder">🐕</span><span class="img-label">Image Placeholder</span>';
+    }
+
+    resultPage.classList.add('active');
+
+    // 滚动到顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // 重新测试
+  window.restart = function() {
+    // 清除所有选择
+    var radios = document.querySelectorAll('.q-card input[type="radio"]:checked');
+    radios.forEach(function(r) { r.checked = false; });
+    // 清除 answered 状态
+    var cards = document.querySelectorAll('.q-card.answered');
+    cards.forEach(function(c) { c.classList.remove('answered'); });
+
+    quizPage.classList.remove('hidden');
+    header.classList.remove('hidden');
+    submitBar.style.display = 'block';
+    resultPage.classList.remove('active');
+
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // 分享
+  window.shareResult = function() {
+    var breed = document.getElementById('resultBreed').textContent;
+    var mbti = document.getElementById('resultType').textContent;
+    var text = '【DOGTI 狗格鉴定】我是"' + mbti + ' ' + breed + '"，快来测测你是什么狗！';
+    if (navigator.share) {
+      navigator.share({ title: 'DOGTI 狗格测试', text: text }).catch(function(){});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      alert('分享文案已复制到剪贴板！');
+    }
+  };
+
+  // 初始化
+  updateProgress();
+})();
+</script>
+
+</body>
+</html>
