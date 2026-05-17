@@ -196,9 +196,6 @@
     color: #fff; font-size: 10px; padding: 6px;
     text-align: center; letter-spacing: 0.5px;
   }
-  .result-type {
-    display: none;
-  }
   .result-breed {
     font-size: 32px; font-weight: 900; color: var(--text);
     letter-spacing: -1px; margin-bottom: 4px;
@@ -507,7 +504,7 @@
       <span class="img-label">Image Placeholder</span>
     </div>
 
-    <div class="result-type" id="resultType">----</div>
+
     <div class="result-breed" id="resultBreed">---</div>
     <div class="result-breed-en" id="resultBreedEn">---</div>
 
@@ -517,8 +514,7 @@
   </div>
 
   <div class="result-actions">
-    <button class="btn-share" onclick="shareResult()">分享我的狗格</button>
-    <button class="btn-restart" onclick="restart()">重新测试</button>
+    <button class="btn-share" onclick="restart()">重新测试</button>
   </div>
 
   <div class="footer">DOGTI · 2026</div>
@@ -592,6 +588,7 @@
   var resultPage = document.getElementById('resultPage');
   var header = document.getElementById('header');
   var progressBarWrap = document.getElementById('progressBarWrap');
+  var currentMbti = '';
 
   function shuffle(arr) {
     var a = arr.slice();
@@ -650,7 +647,10 @@
 
   function getMBTIType(scores) {
     return DIMS.map(function(dim) {
-      return scores[dim] > 0 ? DIM_LABELS[dim][0] : DIM_LABELS[dim][1];
+      var s = scores[dim];
+      if (s > 0) return DIM_LABELS[dim][0];
+      if (s < 0) return DIM_LABELS[dim][1];
+      return Math.random() < 0.5 ? DIM_LABELS[dim][0] : DIM_LABELS[dim][1];
     }).join('');
   }
 
@@ -662,6 +662,8 @@
     var dog = DOG_MAP[mbti];
     if (!dog) { alert('出错了，请联系开发者。MBTI: ' + mbti); return; }
 
+    currentMbti = mbti;
+
     // 确保 resultPage 在 body 下（修复嵌套解析 bug）
     if (resultPage.parentElement !== document.body) {
       document.body.appendChild(resultPage);
@@ -671,7 +673,6 @@
     progressBarWrap.classList.add('hidden');
     submitBar.style.display = 'none';
 
-    document.getElementById('resultType').textContent = mbti;
     document.getElementById('resultBreed').textContent = dog.breed;
     document.getElementById('resultBreedEn').textContent = dog.breedEn;
     document.getElementById('resultDesc').textContent = dog.desc;
@@ -711,7 +712,7 @@
     shareGenerating = true;
 
     var breed = document.getElementById('resultBreed').textContent;
-    var mbti = document.getElementById('resultType').textContent;
+    var mbti = currentMbti;
     var imgPath = IMG_MAP[mbti];
 
     var W = 720, H = 960;
